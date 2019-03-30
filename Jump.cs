@@ -3,50 +3,43 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+
 public class Jump : MonoBehaviour
 {
 
     [SerializeField] Image jumpForceBar;
     public static Rigidbody2D rb;
-    float holdTime;
-   
-     
+    float touchStartTime = 0f;
+    public float speed = 1.5f;
+
+
     // Use this for initialization
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
         jumpForceBar.fillAmount = 0f;
     }
-    
-        void Update()
-        {       
-           if (Input.GetKey(KeyCode.Space))
-           {
-            StartCoroutine("StartCounting");
-            jumpForceBar.fillAmount = 0f;
-           }
-           
-           if (Input.GetKeyUp(KeyCode.Space))
-           {
-            StopCoroutine("StopCounting");
 
-            if (holdTime < 0.2f)
-                Ed.DoJump(20f);
-            else
-                Ed.DoJump(holdTime * 95f);
-
-            jumpForceBar.fillAmount = 0f;
-        }
-    }
-
-    IEnumerator StartCounting()
+    void Update()
     {
-        for (holdTime = 0f; holdTime <= 1f; holdTime += Time.deltaTime)
+
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            jumpForceBar.fillAmount = holdTime;
-            yield return new WaitForSeconds(Time.deltaTime);
+            touchStartTime = Time.time;
+            jumpForceBar.fillAmount = Time.time;
+            jumpForceBar.fillAmount = 1f;
+           
         }
-        holdTime = 1f;
-        jumpForceBar.fillAmount = holdTime;
+
+        if (Input.GetKeyUp(KeyCode.Space))
+        {
+            float delta = Time.time - touchStartTime;
+            float adjustedSpeed = speed * delta;
+            GetComponent<Rigidbody2D>().AddForce(Vector2.up * adjustedSpeed);
+            jumpForceBar.fillAmount = 0f;
+            
+        }
     }
+
+    
+
 }
